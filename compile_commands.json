@@ -1,0 +1,16 @@
+[
+  {
+    "file": "main.c",
+    "arguments": [
+      "gcc",
+      "-Wall",
+      "-Wextra",
+      "-Ithird_party",
+      "main.c",
+      "-o",
+      "learn_c"
+    ],
+    "directory": "/home/crasong/repos/personal/learn_c",
+    "output": "learn_c"
+  }
+]
