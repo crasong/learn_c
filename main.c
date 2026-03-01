@@ -1,63 +1,44 @@
 #include "raylib.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-#include <stdlib.h>
 
-typedef struct {
-  int w, h;
-  unsigned char *pixels;
-} MyImage;
-
-typedef struct {
-  int x, y;
-  int w, h;
-  int color[3];
-} Square;
-
-void SetColorForPixel(MyImage *img, int x, int y, int rgb[3]) {
-
-  img->pixels[(y * img->w + x) * 3 + 0] = rgb[0];
-  img->pixels[(y * img->w + x) * 3 + 1] = rgb[1];
-  img->pixels[(y * img->w + x) * 3 + 2] = rgb[2];
-}
-
-void FillGradient(MyImage *img) {
-  int color[3] = {0, 0, 128};
-  for (int y = 0; y < img->h; ++y) {
-    for (int x = 0; x < img->w; ++x) {
-      color[0] = x;
-      color[1] = y;
-      SetColorForPixel(img, x, y, color);
+void FillGradient() {
+  for (int y = 0; y < GetScreenHeight(); ++y) {
+    for (int x = 0; x < GetScreenWidth(); ++x) {
+      int r = ((float)x / GetScreenWidth()) * 255;
+      int g = ((float)y / GetScreenHeight()) * 255;
+      Color color = {r, g, 128, 255};
+      DrawPixel(x, y, color);
     }
   }
 }
 
-void DrawSquare(MyImage *img, Square *params) {
-  int lastX = params->x + params->w;
-  int lastY = params->y + params->h;
-  for (int y = params->y; y < lastY; ++y) {
-    for (int x = params->x; x < lastX; ++x) {
-      SetColorForPixel(img, x, y, params->color);
-    }
+int main(void) {
+  const int screenWidth = 800;
+  const int screenHeight = 600;
+
+  InitWindow(screenWidth, screenHeight, "My Little Pony");
+
+  int currentFPS = 60;
+
+  Vector2 deltaCircle = {0, (float)screenHeight / 3.0f};
+  Vector2 frameCircle = {0, (float)screenHeight * (2.0f / 3.0f)};
+
+  const float speed = 10.0f;
+  const float circleRadius = 32.0f;
+
+  SetTargetFPS(currentFPS);
+
+  while (!WindowShouldClose()) {
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+    FillGradient();
+    DrawText("WeeWoo Yeehaw cowboy", screenWidth / 2, screenHeight / 2, 24,
+             LIGHTGRAY);
+    EndDrawing();
   }
-}
 
-int main(int argc, char **argv) {
-  if (argc < 3)
-    return 1; // need 2 args to proceed
+  FillGradient();
 
-  int w = atoi(argv[1]);
-  int h = atoi(argv[2]);
-  MyImage img = {.w = w, .h = h, .pixels = malloc(w * h * 3)};
+  CloseWindow();
 
-  Square square = {
-      .x = w / 2, .y = h / 2, .w = w / 4, .h = h / 4, .color = {128, 45, 22}};
-
-  FillGradient(&img);
-  DrawSquare(&img, &square);
-
-  stbi_write_png("out.png", w, h, 3, img.pixels, w * 3);
-
-  free(img.pixels);
   return 0;
 }
